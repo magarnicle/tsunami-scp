@@ -174,6 +174,11 @@ int main(int argc, char *argv[])
 
             /* close the client socket */
             close(client_fd);
+            /* if this was called with the --onetransfer option, close the server. The child will close
+             when it is done anyway. */
+            if (parameter.one_transfer) {
+                return 0;
+            }
         }
     }
 }
@@ -476,7 +481,8 @@ void client_handler(ttp_session_t *session)
  *------------------------------------------------------------------------*/
 void process_options(int argc, char *argv[], ttp_parameter_t *parameter)
 {
-    struct option long_options[] = { { "verbose",    0, NULL, 'v' },
+    struct option long_options[] = {
+                     { "verbose",    0, NULL, 'v' },
                      { "transcript", 0, NULL, 't' },
                      { "v6",         0, NULL, '6' },
                      { "port",       1, NULL, 'p' },
@@ -491,6 +497,8 @@ void process_options(int argc, char *argv[], ttp_parameter_t *parameter)
                      { "vsibmode",   1, NULL, 'M' },
                      { "vsibskip",   1, NULL, 'S' },
                      #endif
+                     { "onetransfer",0, NULL, 'o' },
+                     { "o",          0, NULL, 'o' },
                      { NULL,         0, NULL, 0 } };
     struct stat   filestat;
     int           which;
@@ -550,6 +558,10 @@ void process_options(int argc, char *argv[], ttp_parameter_t *parameter)
         case 'S':  vsib_mode_skip_samples = atoi(optarg);
              break;
         #endif
+        /* --onetransfer    : stop server after one transfer*/
+        case 'o':  parameter->one_transfer = 1;
+             break;
+
 
         /* otherwise    : display usage information */
         default: 

@@ -18,13 +18,17 @@ def start_server(file_name):
             The file to transfer.
         return :: int
             The port number of the server.
+
+        (command)
     """
     pass
 
-def receive_file(file_name, port, dry_run=False):
+def receive_file(source_file_name, destination_file_name, port, dry_run=False):
     """Starts the tsunami-udp client, which then receives the file.
 
-        file_name :: str
+        source_file_name :: str
+            The file to receive.
+        destination_file_name :: str
             The url - [username@][machine][:port]file_path - to send the file to.
         port :: int
             The port the server is listening on.
@@ -32,6 +36,8 @@ def receive_file(file_name, port, dry_run=False):
             Start the client but don't actually transfer the file.
         return :: int
             The return code of the client.
+
+        (command)
     """
     pass
 

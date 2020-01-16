@@ -1,35 +1,59 @@
 import unittest
+import tsunami_scp.__main__ as tsu
 
 class TestStartServer(unittest.TestCase):
 
-	def setUp(self):
-		pass
+    def setUp(self):
+        self.test_file_path = '/tmp/test_file.txt'
+        with open(self.test_file_path, 'w+') as test_file:
+            test_file.write('a')
 
-	def tearDown(self):
-		pass
+    def tearDown(self):
+        pass
 
-	def testA(self):
-		pass
+    def testNoFileName(self):
+        """No file name is an error."""
+        try:
+            tsu.start_server(None)
+        except Exception:
+            assert True
+        else:
+            assert False
 
-	# No file name is an error
-	# Non-existant file is an error
-	# Tsunami-udp non-existant on source machine is an error
+    def testBadFilePath(self):
+        """Non-existent file is an error."""
+        try:
+            tsu.start_server('/a/path/that/is/not/real')
+        except Exception:
+            assert True
+        else:
+            assert False
+
+    def testNoTsunami(self):
+        """Tsunami-UDP non-existent on source machine is an error."""
+        tsu.TSUNAMI_PATH = '/a/path/that/is/not/real'
+        try:
+            tsu.start_server(self.test_file_path)
+        except Exception:
+            assert True
+        else:
+             assert False
     # Returns port number of started server
     # If a server is running on the first tried port, it will start on the second
     # If a server is running on all ports in the range, raise an error
-	
+    
 
 
 class TestReceiveFile(unittest.TestCase):
 
-	def setUp(self):
-		pass
+    def setUp(self):
+        pass
 
-	def tearDown(self):
-		pass
+    def tearDown(self):
+        pass
 
-	def testA(self):
-		pass
+    def testA(self):
+        pass
 
     # No source file name is an error
     # No destination file name is an erro

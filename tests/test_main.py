@@ -64,7 +64,7 @@ class TestStartServer(unittest.TestCase):
         preexisting_server1 = subprocess.Popen(['tsunamid', '--port=46224'])
         preexisting_server2 = subprocess.Popen(['tsunamid', '--port=46225'])
         try:
-            tsu.start_server(self.test_file_path, timeout=1)
+            tsu.start_server(self.test_file_path, timeout=1, ports=[46224, 46225])
         except Exception:
             assert True
         else:

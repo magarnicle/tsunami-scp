@@ -1,9 +1,11 @@
 import unittest
+import subprocess
 import tsunami_scp.__main__ as tsu
 
 class TestStartServer(unittest.TestCase):
 
     def setUp(self):
+        tsu.TSUNAMI_PATH = None
         self.test_file_path = '/tmp/test_file.txt'
         with open(self.test_file_path, 'w+') as test_file:
             test_file.write('a')
@@ -33,14 +35,43 @@ class TestStartServer(unittest.TestCase):
         """Tsunami-UDP non-existent on source machine is an error."""
         tsu.TSUNAMI_PATH = '/a/path/that/is/not/real'
         try:
-            tsu.start_server(self.test_file_path)
+            tsu.start_server(self.test_file_path, timeout=0.1)
         except Exception:
             assert True
         else:
              assert False
-    # Returns port number of started server
-    # If a server is running on the first tried port, it will start on the second
-    # If a server is running on all ports in the range, raise an error
+
+    def testPortNumberReturned(self):
+        """Returns port number of started server."""
+        result = tsu.start_server(self.test_file_path, timeout=1)
+        assert type(result) == int
+        assert result == 46224
+
+    def testFindsOpenPort(self):
+        """If a server is running on the first tried port, it will start on the second."""
+        preexisting_server = subprocess.Popen(['tsunamid', '--port=46224'])
+        try:
+            result = tsu.start_server(self.test_file_path, timeout=1)
+            assert result == 46225
+        except Exception:
+            raise
+        finally:
+            preexisting_server.kill()
+        
+
+    def testAllPortsClosed(self):
+        """If a server is running on all ports in the range, raise an error."""
+        preexisting_server1 = subprocess.Popen(['tsunamid', '--port=46224'])
+        preexisting_server2 = subprocess.Popen(['tsunamid', '--port=46225'])
+        try:
+            tsu.start_server(self.test_file_path, timeout=1)
+        except Exception:
+            assert True
+        else:
+            assert False
+        finally:
+            preexisting_server1.kill()
+            preexisting_server2.kill()
     
 
 

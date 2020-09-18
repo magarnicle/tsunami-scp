@@ -14,6 +14,7 @@ from docopt import docopt
 from pprint import pprint
 
 TSUNAMI_PATH = None
+REMOTE_TSUNAMI_PATH = None
 
 def start_server(file_name, timeout=None, ports=None):
     """Starts the tsunami-udp server, ready to serve the file.
@@ -42,7 +43,7 @@ def start_server(file_name, timeout=None, ports=None):
     else:
         return port_number
 
-def receive_file(source_file_name, destination_file_name, port, dry_run=False):
+def receive_file(server, destination_file_name, port, dry_run=False):
     """Starts the tsunami-udp client, which then receives the file.
 
         source_file_name :: str
@@ -58,6 +59,9 @@ def receive_file(source_file_name, destination_file_name, port, dry_run=False):
 
         (command)
     """
+    args = [REMOTE_TSUNAMI_PATH or 'tsunami', f'--port={port_numer}', 'connect', server, 'get', destination_file_name]
+    proc = subprocess.run()
+
     pass
 
 def main():

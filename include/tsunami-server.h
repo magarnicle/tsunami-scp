@@ -116,6 +116,7 @@ typedef struct {
     u_int16_t           faster_den;     /* the denominator of the decrease-IPD factor */
     char                *ringbuf;       /* Pointer to ring buffer start               */
     u_int16_t           fileout;        /* Do we store the data to file?              */
+    u_int16_t           one_transfer;   /* Do we exit after one file is transferred?  */
     int                 slotnumber;     /* Slot number for distributed transfer       */
     int                 totalslots;     /* How many slots do we have?                 */
     int                 samplerate;     /* Sample rate in MHz (optional)              */

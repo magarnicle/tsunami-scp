@@ -71,6 +71,7 @@
 #include <unistd.h>      /* for standard Unix system calls */
 #include <assert.h>
 #include <math.h>        /* floor() */
+#include <tinydir/tinydir.h>
 
 
 #include <tsunami-server.h>
@@ -315,7 +316,6 @@ int ttp_open_port(ttp_session_t *session)
     session->transfer.udp_address = address;
     return 0;
 }
-
 
 /*------------------------------------------------------------------------
  * int ttp_open_transfer(ttp_session_t *session);

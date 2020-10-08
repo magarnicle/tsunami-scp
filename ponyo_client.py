@@ -46,12 +46,19 @@ def client(server: str, filename: str, destination: str, tsunami_port: int=None,
             stdin=subprocess.PIPE).wait()
             #sh.ssh(get_ssh_connection_string(server, ssh_username, ssh_port), f"\"cd {destination_dir} && /usr/local/bin/tsunami connect {tsunami_connection} get {filename} exit\"", _fg=True)
 
+def get_server_args(filename):
+    path = Path(filename).expanduser()
+    if path.is_dir():
+        raise OSError(f"{filename} is a directory")
+    return path.name, path.parent
+
 def main(ops):
     print(ops)
     #server_thread = threading.Thread(target=sh.tsunamid, args=[ops["FILE"]], kwargs={"cd": "/Users/Matt/Downloads"})
     #server_thread = multiprocessing.Process(target=sh.tsunamid, args=[ops["FILE"]], kwargs={"cd": "/Users/Matt/Downloads"})
     #server_thread.start()
-    server_thread = subprocess.Popen(["tsunamid", ops['FILE']], cwd="/Users/Matt/Downloads")
+    basename, directory = get_server_args(ops["FILE"])
+    server_thread = subprocess.Popen(["tsunamid", basename], cwd=directory)
     try:
         client(ops["SERVER"], ops["FILE"], ops["DESTINATION"], ops["PORT"])
     except Exception:

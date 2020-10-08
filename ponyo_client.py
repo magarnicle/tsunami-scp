@@ -9,14 +9,17 @@ Usage:
 import typing as ty
 from docopt import docopt
 from pathlib import Path
-import sh
-import multiprocessing
 import subprocess
-import threading
 
-def check_args(files, destination):
+def check_args(files: ty.List[str], destination: str):
     if len(files) > 1:
         assert destination.endswith("/")
+
+def get_server_args(filename: str) -> ty.Tuple[str, str]:
+    path = Path(filename).expanduser()
+    if path.is_dir():
+        raise OSError(f"{filename} is a directory")
+    return path.name, str(path.parent)
 
 def get_ssh_connection_string(server: str, username: str=None, port: int=None) -> str:
     connection_string = server
@@ -28,35 +31,20 @@ def get_ssh_connection_string(server: str, username: str=None, port: int=None) -
 
 def client(server: str, filename: str, destination: str, tsunami_port: int=None, ssh_username: str=None, ssh_port: int=None) -> None:
     tsunami_connection = f"{server} set port {tsunami_port}" if tsunami_port else server
-    destination = Path(destination)
-    if destination.is_dir:
-        destination_dir = str(destination)
-    else:
-        destination_dir = str(Path(destination).parent)
-    with open("/tmp/out.txt", "w+") as out_file:
-        with open("/tmp/err.txt", "w+") as err_file:
-            subprocess.Popen([
-                "/Users/Matt/Dev/tsunami-scp/client.sh",
-                get_ssh_connection_string(server, ssh_username, ssh_port),
-                destination_dir,
-                tsunami_connection,
-                filename,
-            ],
-            #ssh_port), f"\"ls / && cd {destination_dir} && /usr/local/bin/tsunami 'connect {tsunami_connection} get {filename} exit'\""],
-            stdin=subprocess.PIPE).wait()
-            #sh.ssh(get_ssh_connection_string(server, ssh_username, ssh_port), f"\"cd {destination_dir} && /usr/local/bin/tsunami connect {tsunami_connection} get {filename} exit\"", _fg=True)
+    destination_path = Path(destination)
+    if not destination_path.is_dir:
+        destination = str(destination_path.parent)
+    subprocess.Popen([
+        "/Users/Matt/Dev/tsunami-scp/client.sh",
+        get_ssh_connection_string(server, ssh_username, ssh_port),
+        destination,
+        tsunami_connection,
+        filename,
+    ],
+    stdin=subprocess.PIPE).wait()
 
-def get_server_args(filename):
-    path = Path(filename).expanduser()
-    if path.is_dir():
-        raise OSError(f"{filename} is a directory")
-    return path.name, path.parent
-
-def main(ops):
+def main(ops: ty.Dict[str, ty.Any]):
     print(ops)
-    #server_thread = threading.Thread(target=sh.tsunamid, args=[ops["FILE"]], kwargs={"cd": "/Users/Matt/Downloads"})
-    #server_thread = multiprocessing.Process(target=sh.tsunamid, args=[ops["FILE"]], kwargs={"cd": "/Users/Matt/Downloads"})
-    #server_thread.start()
     basename, directory = get_server_args(ops["FILE"])
     server_thread = subprocess.Popen(["tsunamid", basename], cwd=directory)
     try:

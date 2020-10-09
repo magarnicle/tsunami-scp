@@ -5,6 +5,9 @@ If more than one file is to be recieved, the destination must be a directory.
 Usage:
     ponyo_client -s SERVER [-p PORT] FILE DESTINATION
 
+Options:
+    -p PORT     Port number for Tsunami to use
+
 """
 import typing as ty
 from docopt import docopt
@@ -30,7 +33,7 @@ def get_ssh_connection_string(server: str, username: str=None, port: int=None) -
     return connection_string
 
 def client(server: str, filename: str, destination: str, tsunami_port: int=None, ssh_username: str=None, ssh_port: int=None) -> None:
-    tsunami_connection = f"{server} set port {tsunami_port}" if tsunami_port else server
+    tsunami_connection = f"set port {tsunami_port}" if tsunami_port else server
     destination_path = Path(destination)
     if not destination_path.is_dir:
         destination = str(destination_path.parent)
@@ -48,7 +51,7 @@ def main(ops: ty.Dict[str, ty.Any]):
     basename, directory = get_server_args(ops["FILE"])
     server_thread = subprocess.Popen(["tsunamid", basename], cwd=directory)
     try:
-        client(ops["SERVER"], ops["FILE"], ops["DESTINATION"], ops["PORT"])
+        client(ops["SERVER"], ops["FILE"], ops["DESTINATION"], ops.get("PORT", 46224))
     except Exception:
         raise
     finally:

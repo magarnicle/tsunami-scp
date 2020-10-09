@@ -14,7 +14,8 @@ IFS=$'\n\t' # set array separator to newline and tab to avoid word splitting bug
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 ROOT_PID=$$
 
-/usr/bin/ssh "$1" 'cd "'"$2"'" && /usr/local/bin/tsunami connect '"$3"' get '"$4"' exit'
+this_ip=$(ipconfig getifaddr en0)
+/usr/bin/ssh "$1" 'cd "'"$2"'" && /usr/local/bin/tsunami connect '"$this_ip"' '"$3"' get '"$4"' exit'
 
 ###
 function finally {
